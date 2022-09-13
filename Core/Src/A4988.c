@@ -8,11 +8,9 @@
 
 #include "A4988.h"
 
-void stepperDriverInit(StepperDriver* spdv,long max_steps,
-		short step_pin,short dir_pin,short enable_pin){
-	spdv->step_pin = step_pin;
-	spdv->dir_pin = dir_pin;
-	spdv->enable_pin = enable_pin;
+void stepperDriver_Config(StepperDriver* spdv,StepperDriverPins pin, StepperDriverPorts port,short max_steps){
+	spdv->pin = pin;
+	spdv->port = port;
 
 	spdv->microstep_resolution=2;//(1,2,4,8,...)
 
@@ -24,7 +22,8 @@ void stepperDriverInit(StepperDriver* spdv,long max_steps,
 
 	//Motor setting
 	spdv->max_steps = max_steps;
-	spdv->busy_status_flag = 0;
+	spdv->remain_status_flag = 0;
+
 }
 
 void rotate(StepperDriver* spdv, long deg){
@@ -34,8 +33,10 @@ void rotate(StepperDriver* spdv, long deg){
 void move(StepperDriver* spdv,long steps){
 	spdv->step_pulse = steps;
 
-	if(!spdv->busy_status_flag){
-
+	spdv->remain_status_flag = 0;
+	if(!spdv->remain_status_flag){
+		//HAL_GPIO_WritePin(spdv->port.ENABLE_PORT, spdv->pin.ENABLE_PIN, GPIO_PIN_SET);
+		HAL_GPIO_TogglePin(spdv->port.STEP_PORT, spdv->pin.STEP_PIN);
 	}
 
 

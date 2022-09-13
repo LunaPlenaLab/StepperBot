@@ -8,7 +8,7 @@
 #ifndef INC_A4988_H_
 #define INC_A4988_H_
 
-
+#include "main.h"
 
 #define ENABLE_A4988_1 	GPIO_Pin_0
 #define MS1_A4988_1 		GPIO_Pin_6
@@ -17,18 +17,33 @@
 #define STEP_A4988_1		GPIO_Pin_4
 #define DIR_A4988_1		GPIO_Pin_5
 
-
+#define A4988_NUM (2)
 
 
 typedef struct{
-	int step_degree;
-}StepperMotor;
+	uint16_t ENABLE_PIN;
+	uint16_t MS1_PIN;
+	uint16_t MS2_PIN;
+	uint16_t MS3_PIN;
+	uint16_t STEP_PIN;
+	uint16_t DIR_PIN;
+}StepperDriverPins;
+
+
+typedef struct{
+	GPIO_TypeDef * ENABLE_PORT;
+	GPIO_TypeDef * MS1_PORT;
+	GPIO_TypeDef * MS2_PORT;
+	GPIO_TypeDef * MS3_PORT;
+	GPIO_TypeDef * STEP_PORT;
+	GPIO_TypeDef * DIR_PORT;
+}StepperDriverPorts;
 
 
 typedef struct  {
-	short step_pin;
-	short dir_pin;
-	short enable_pin;
+	StepperDriverPins pin;
+	StepperDriverPorts port;
+
 
 	short microstep_resolution;//(1,2,4,8,...)
 
@@ -41,14 +56,14 @@ typedef struct  {
 	//Motor setting
 	short max_steps; //max steps is 200(=360/1.8) if your motor have 1.8 step.
 
-	short busy_status_flag; //if this is 1, busy
+	short remain_status_flag; //if this is 1, busy
 }StepperDriver;
 
-void stepperDriverInit(StepperDriver* spdv,long max_steps,
-		short step_pin,short dir_pin,short enable_pin);
+void stepperDriver_Config(StepperDriver* spdv,StepperDriverPins pin, StepperDriverPorts port,short max_steps);
 void rotate(StepperDriver* spdv, long deg);
 void move(StepperDriver* spdv,long steps);
-static long calcStepsForRotation(StepperDriver* spdv,double deg);
+long calcStepsForRotation(StepperDriver* spdv,double deg);
+
 
 
 
